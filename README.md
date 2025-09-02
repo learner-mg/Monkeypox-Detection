@@ -26,5 +26,5 @@ It was developed and run on **Google Colab**.
 ### Option 2: Run Locally
 1. Clone this repository:
    ```bash
-   git clone 
+   git clone https://github.com/learner-mg/Monkeypox-Detection.git
 

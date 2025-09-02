@@ -13,14 +13,18 @@ It was developed and run on **Google Colab**.
 ---
 
 ## 📂 Files in this Repo
-- `Monkeypox_detection_final_prediction_output.ipynb` → Main Jupyter Notebook with the code.
+- - `monkeypox_detector.py` → Full code for dataset handling, model training, evaluation, and Gradio app.
 
 ---
-
-## 🚀 How to Use
- 🚀 How to Use
-1. Download the notebook (`.ipynb`) file from this repo.
+## 🚀 How to Run
+### Option 1: Run in Google Colab
+1. Copy the code from `monkeypox_detector.py` or use the `.ipynb` notebook.
 2. Open [Google Colab](https://colab.research.google.com/).
-3. Upload the notebook (`File > Upload notebook`).
+3. Paste/upload the file.
 4. Run the cells step by step.
+
+### Option 2: Run Locally
+1. Clone this repository:
+   ```bash
+   git clone 
 

@@ -1,0 +1,369 @@
+import numpy as np
+import IPython.display as display
+from matplotlib import pyplot as plt
+import io
+import base64
+
+ys = 200 + np.random.randn(100)
+x = [x for x in range(len(ys))]
+
+fig = plt.figure(figsize=(4, 3), facecolor='w')
+plt.plot(x, ys, '-')
+plt.fill_between(x, ys, 195, where=(ys > 195), facecolor='g', alpha=0.6)
+plt.title("Sample Visualization", fontsize=10)
+
+data = io.BytesIO()
+plt.savefig(data)
+image = F"data:image/png;base64,{base64.b64encode(data.getvalue()).decode()}"
+alt = "Sample Visualization"
+display.display(display.Markdown(F"""![{alt}]({image})"""))
+plt.close(fig)
+
+!pip install kaggle
+from google.colab import files
+files.upload()  # Upload kaggle.json
+import os
+import zipfile
+
+# Create directory for kaggle
+os.makedirs('/root/.kaggle', exist_ok=True)
+
+# Move the uploaded kaggle.json to that directory
+os.rename('kaggle.json','/root/.kaggle/kaggle.json')
+
+# Set permissions
+os.chmod('/root/.kaggle/kaggle.json', 600)
+!kaggle datasets download -d nafin59/monkeypox-skin-lesion-dataset
+from google.colab import drive
+drive.mount('/content/drive')
+import zipfile
+
+with zipfile.ZipFile('monkeypox-skin-lesion-dataset.zip', 'r') as zip_ref:
+    zip_ref.extractall('monkeypox_dataset')
+
+import os
+import numpy as np
+import matplotlib.pyplot as plt
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.applications import MobileNetV2
+from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
+from sklearn.metrics import classification_report, confusion_matrix
+
+img_size = 224
+batch_size = 32
+
+train_dir = '/content/monkeypox_dataset/Train'
+val_dir = '/content/monkeypox_dataset/test'
+
+'/content/monkeypox_dataset/Train'
+import os
+
+# List main directory
+print("monkeypox_dataset content:")
+print(os.listdir("/content"))
+
+# List inside the dataset folder
+print("\nContents of /content/monkeypox_dataset:")
+print(os.listdir("/content/monkeypox_dataset"))
+train_dir = '/content/monkeypox_dataset/train'
+val_dir = '/content/monkeypox_dataset/test'
+import os
+
+# Check what’s in the current directory
+print("🔍 Listing /content:")
+print(os.listdir("/content"))
+
+# Check inside potential dataset folder(s)
+if 'monkeypox_dataset' in os.listdir("/content"):
+    print("\n🔍 Listing /content/monkeypox_dataset:")
+    print(os.listdir("/content/monkeypox_dataset"))
+elif 'monkeypox-skin-lesion-dataset' in os.listdir("/content"):
+    print("\n🔍 Listing /content/monkeypox-skin-lesion-dataset:")
+    print(os.listdir("/content/monkeypox-skin-lesion-dataset"))
+
+train_dir = '/content/monkeypox-skin-lesion-dataset/train'
+val_dir = '/content/monkeypox-skin-lesion-dataset/test'
+
+# Auto-detect folder with "train" inside it
+base_path = ""
+for f in os.listdir("/content"):
+    full_path = os.path.join("/content", f)
+    # Check if the item is a directory before listing its contents
+    if os.path.isdir(full_path):
+        if 'train' in os.listdir(full_path):
+            base_path = full_path
+            break
+
+train_dir = os.path.join(base_path, 'train')
+val_dir = os.path.join(base_path, 'test')
+
+print("Train dir:", train_dir)
+print("Val dir:", val_dir)
+
+from tensorflow.keras.applications import MobileNetV2
+from tensorflow.keras.layers import GlobalAveragePooling2D, Dense
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
+
+# Load base model
+base_model = MobileNetV2(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
+base_model.trainable = False  # Freeze the base model
+
+# Add custom classification head
+x = base_model.output
+x = GlobalAveragePooling2D()(x)
+x = Dense(64, activation='relu')(x)
+predictions = Dense(1, activation='sigmoid')(x)
+
+model = Model(inputs=base_model.input, outputs=predictions)
+
+# Compile model
+model.compile(optimizer=Adam(learning_rate=1e-4),
+              loss='binary_crossentropy',
+              metrics=['accuracy'])
+
+model.summary()
+
+import os
+
+# Print everything in /content
+print("🔍 Top-level content in /content:")
+print(os.listdir("/content"))
+
+# Try listing the contents of every folder
+print("\n🔍 Inspecting subfolders:")
+for item in os.listdir("/content"):
+    path = os.path.join("/content", item)
+    if os.path.isdir(path):
+        print(f"\n📁 {item}/ contains:")
+        print(os.listdir(path))
+
+!ls /content
+import os
+print(os.listdir('/content/monkeypox_dataset'))
+print(os.listdir('/content/monkeypox_dataset/Fold1/Fold1'))
+print(os.listdir('/content/monkeypox_dataset/Fold1/Fold1/Fold1'))
+train_dir = '/content/monkeypox_dataset/Fold1/Fold1/Fold1/Train'
+val_dir = '/content/monkeypox_dataset/Fold1/Fold1/Fold1/Val'
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+
+img_size = 224  # or your preferred size
+batch_size = 32
+
+train_gen = ImageDataGenerator(rescale=1./255)
+val_gen = ImageDataGenerator(rescale=1./255)
+
+train_data = train_gen.flow_from_directory(
+    train_dir,
+    target_size=(img_size, img_size),
+    batch_size=batch_size,
+    class_mode='binary'
+)
+
+val_data = val_gen.flow_from_directory(
+    val_dir,
+    target_size=(img_size, img_size),
+    batch_size=batch_size,
+    class_mode='binary'
+)
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
+
+model = Sequential([
+    Conv2D(32, (3, 3), activation='relu', input_shape=(img_size, img_size, 3)),
+    MaxPooling2D(2, 2),
+
+    Conv2D(64, (3, 3), activation='relu'),
+    MaxPooling2D(2, 2),
+
+    Conv2D(128, (3, 3), activation='relu'),
+    MaxPooling2D(2, 2),
+
+    Flatten(),
+    Dense(128, activation='relu'),
+    Dropout(0.5),
+    Dense(1, activation='sigmoid')  # Binary classification
+])
+
+model.compile(optimizer='adam',
+              loss='binary_crossentropy',
+              metrics=['accuracy'])
+from tensorflow.keras import Input
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
+
+model = Sequential([
+    Input(shape=(img_size, img_size, 3)),
+    Conv2D(32, (3, 3), activation='relu'),
+    MaxPooling2D(2, 2),
+
+    Conv2D(64, (3, 3), activation='relu'),
+    MaxPooling2D(2, 2),
+
+    Conv2D(128, (3, 3), activation='relu'),
+    MaxPooling2D(2, 2),
+
+    Flatten(),
+    Dense(128, activation='relu'),
+    Dropout(0.5),
+    Dense(1, activation='sigmoid')
+])
+
+model.compile(optimizer='adam',
+              loss='binary_crossentropy',
+              metrics=['accuracy'])
+history = model.fit(
+    train_data,
+    validation_data=val_data,
+    epochs=10
+)
+test_dir = '/content/monkeypox_dataset/Fold1/Fold1/Fold1/Test'
+
+test_gen = ImageDataGenerator(rescale=1./255)
+
+test_data = test_gen.flow_from_directory(
+    test_dir,
+    target_size=(img_size, img_size),
+    batch_size=batch_size,
+    class_mode='binary',
+    shuffle=False  # Important for correct label prediction alignment
+)
+loss, accuracy = model.evaluate(test_data)
+print(f'Test Accuracy: {accuracy*100:.2f}%')
+import matplotlib.pyplot as plt
+
+# Accuracy plot
+plt.plot(history.history['accuracy'], label='Train Accuracy')
+plt.plot(history.history['val_accuracy'], label='Val Accuracy')
+plt.title('Model Accuracy')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.show()
+
+# Loss plot
+plt.plot(history.history['loss'], label='Train Loss')
+plt.plot(history.history['val_loss'], label='Val Loss')
+plt.title('Model Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
+plt.show()
+model.save('monkeypox_classifier_model.h5')  # Saves weights + architecture
+from tensorflow.keras.models import load_model
+model = load_model('monkeypox_classifier_model.h5')
+import os
+print(os.listdir('/content/monkeypox_dataset/Original Images'))
+img_path = '/content/monkeypox_dataset/Original Images/M55_01_06.jpg'  # Replace with actual name
+import os
+print(os.listdir('/content/monkeypox_dataset/Original Images'))
+print(os.listdir('/content/monkeypox_dataset/Original Images/Original Images'))
+print(os.listdir('/content/monkeypox_dataset/Original Images/Original Images/Monkey Pox'))
+files = os.listdir('/content/monkeypox_dataset/Original Images/Original Images/Monkey Pox')
+print(files)
+img_path = '/content/monkeypox_dataset/Original Images/Original Images/Monkey Pox/M13_01.jpg'
+from tensorflow.keras.preprocessing import image
+import numpy as np
+
+img_path = '/content/monkeypox_dataset/Original Images/Original Images/Monkey Pox/M28_02.jpg'  # Use exact name
+img = image.load_img(img_path, target_size=(img_size, img_size))
+img_array = image.img_to_array(img)
+img_array = np.expand_dims(img_array, axis=0) / 255.0
+
+prediction = model.predict(img_array)
+print("Prediction:", "Monkeypox" if prediction[0][0] > 0.5 else "Others")
+
+print(os.listdir('/content/monkeypox_dataset/Original Images/Original Images/Monkey Pox'))
+
+val_loss, val_acc = model.evaluate(val_data)
+print(f"Validation Accuracy: {val_acc*100:.2f}%")
+
+test_loss, test_acc = model.evaluate(test_data)
+print(f"Test Accuracy: {test_acc*100:.2f}%")
+
+import matplotlib.pyplot as plt
+
+plt.plot(history.history['accuracy'], label='Train Accuracy')
+plt.plot(history.history['val_accuracy'], label='Val Accuracy')
+plt.xlabel('Epochs')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.title('Training & Validation Accuracy')
+plt.show()
+
+model.save('monkeypox_classifier.h5')
+
+def predict_image(img_path):
+    img = image.load_img(img_path, target_size=(img_size, img_size))
+    img_array = image.img_to_array(img)
+    img_array = np.expand_dims(img_array, axis=0) / 255.0
+    prediction = model.predict(img_array)[0][0]
+    return "Monkeypox" if prediction > 0.5 else "Others"
+
+print(predict_image('/content/monkeypox_dataset/Original Images/Original Images/Monkey Pox/M12_01.jpg'))
+
+folder_path = '/content/monkeypox_dataset/Original Images/Original Images/Monkey Pox'
+
+for filename in os.listdir(folder_path):
+    if filename.lower().endswith(('.jpg', '.jpeg', '.png')):
+        img_path = os.path.join(folder_path, filename)
+        result = predict_image(img_path)
+        print(f"{filename} → {result}")
+
+from google.colab import files
+uploaded = files.upload()
+
+uploaded_file = list(uploaded.keys())[0]
+print(predict_image(uploaded_file))
+
+import matplotlib.pyplot as plt
+
+plt.plot(history.history['accuracy'], label='Train Acc')
+plt.plot(history.history['val_accuracy'], label='Val Acc')
+plt.legend()
+plt.title('Training vs Validation Accuracy')
+plt.show()
+
+img_array = np.expand_dims(img_array, axis=0) / 255.0
+
+ImageDataGenerator(rescale=1./255)
+
+print(train_data.class_indices)
+
+print(f"Raw prediction score: {prediction[0][0]:.4f}")
+
+print("Prediction:", "Monkeypox" if prediction[0][0] < 0.5 else "Others")
+
+print(train_data.class_indices)
+
+class_indices = train_data.class_indices
+class_names = list(class_indices.keys())
+print("Class order used in model:", class_names)
+
+!pip install gradio
+
+!pip install gradio
+
+import gradio as gr
+from tensorflow.keras.preprocessing import image
+import numpy as np
+
+# Classify function
+def classify_monkeypox(img):
+    img = img.resize((img_size, img_size))
+    img_array = image.img_to_array(img)
+    img_array = np.expand_dims(img_array, axis=0) / 255.0
+    prediction = model.predict(img_array)[0][0]
+    label = "Monkeypox" if prediction < 0.5 else "Others"
+    return f"{label} (Confidence: {1 - prediction if prediction < 0.5 else prediction:.4f})"
+
+# Gradio Interface
+gr.Interface(
+    fn=classify_monkeypox,
+    inputs=gr.Image(type="pil"),
+    outputs="text",
+    title="Monkeypox Detector",
+    description="Upload an image to predict whether it's Monkeypox or not"
+).launch()
